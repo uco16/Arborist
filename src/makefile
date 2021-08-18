@@ -5,7 +5,7 @@ RM=rm -f
 EXE=Arborist
 
 # Source and object files
-SRCS=main.cpp position.cpp types.cpp misc.cpp evaluate.cpp
+SRCS=main.cpp position.cpp types.cpp misc.cpp evaluate.cpp search.cpp
 OBJS=$(subst .cpp,.o,$(SRCS))
 
 all: $(EXE)

@@ -1,0 +1,23 @@
+Arborist: Chess engine.
+
+A. One main file to call in command line interface. Functions of main file:
+ 1. Main engine:
+  1.1 put in a FEN string for a given position
+  1.2 find the best move in a given position
+ 2. Essential Auxiliary features:
+  2.1 evaluate position
+  2.2 tree traversal and pruning
+ 3. Non-essential features:
+  3.1 print out FEN string for given position
+  3.2 make a move (/if legal)
+  3.3 print out history of moves
+
+B. Error handling strategy:
+ 1. Square Structs
+  1.1 Rank & File & oct structs for constrained chars / ints between 'a' and 'h' and 1 & 8 and 0 & 7 respectively
+
+C. Search strategy:
+ 1. alpha-beta pruning
+ 2. transposition table
+ 3. keep branches sorted to always try out the best first
+ 4. iterative deepening

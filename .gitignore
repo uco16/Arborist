@@ -1,3 +1,10 @@
+# Vim Files
+*.swp
+tags
+
+# make files
+.depend
+
 # Prerequisites
 *.d
 

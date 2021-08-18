@@ -1,0 +1,8 @@
+"A Tour of C++" performance tips:
+- use constexpr's for compile-time evaluation §1.7 (even functions)
+- use const or reference (&) in function argument to not have the cost of copying (p23) (Q: why does const not incur copying cost?)
+- inline simple operations (ie no function calls in generated machine code)
+- precise control of destruction
+
+Stockfish Github:
+- threading (use number of threads equal to number of CPU cores)

@@ -1,0 +1,31 @@
+--- POSITION ---
+Minimum amount of memory needed to store a position:
+Bit maps use 64 bits (one for each square), squares take 6 bits (integer from 0 to 63).
+
+So if there are more than 10 of the same type that can be grouped together, we should store it in a bit map.
+
+So it seems like the minimum needed to record the starting position (no promotions) is:
+* bit maps: (64 bits)
+    * white pawns
+    * black pawns
+* squares: (6 bits)
+    * K, k, q, Q, RR, rr, NN, nn, BB, bb (16)
+    * en-passant (1)
+* castling possibilities (4 bits)
+* active color (1 bit)
+* halfmove_clock (6 bits, need only keep track of numbers 0 through 50)
+* fullmoves (9 bits, longest chess game in history is 269 moves)
+
+In total, this is 250 bits.
+Thus we need 4 64 bit chars to keep track of them. And we have 6 bits left over (for added pieces due to promotions?).
+
+As soon as there are more than 10 of each type (e.g. lots of promotions, unlikely) it becomes more efficient to store queens (or bishops, knights, rooks) in a bitmap.
+
+As soon as the number of white or black pawns drops below 11, it makes more sense to use individual squares to keep track of them.
+
+
+--- MOVES ---
+To store a move, we need to keep track of 
+* squares (6 bit)
+    * initial square
+    * final square

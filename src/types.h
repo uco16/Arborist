@@ -17,35 +17,102 @@ enum class PieceType {
 };
 
 enum class Color {white, black};
-Color operator~(const Color c);
 
 struct File {
-  File(int i) :index{i} {}
+  File () {}
+  constexpr File(int i) :index{i} {}
   int index;
 };
 
 struct Rank {
-  Rank(int i) :index{i} {}
+  Rank () {}
+  constexpr Rank(int i) :index{i} {}
   int index;
 };
 
 struct Square {
-  Square() :file{0}, rank{0} {}
-  Square(File f, Rank r) :file{f}, rank{r} {}
+  Square() {}
+  constexpr Square(File f, Rank r) :file{f}, rank{r} {}
   File file;
   Rank rank;
 };
 
-vector<Piece> placement_to_pieces(const string& piece_placement);
-char piece_to_char(const Piece pc);
-string pieces_to_string(const vector<Piece>& pcs);
-Color char_to_color(const string& col);
-char color_to_char(const Color col);
-Square algebraic_to_square(const string& alg);
-string square_to_alg(const Square& sq);
-int square_to_int(const Square& sq);
+struct Move {
+  Move() {}
+  constexpr Move(Square i, Square f) :isq{i}, fsq{f} {}
+  Square isq;
+  Square fsq;
+};
 
-PieceType type_of(const Piece& pc);
-Color color_of(const Piece& pc);
+struct FileDiff {
+  FileDiff() {}
+  constexpr FileDiff(int i) :index{i} {}
+  int index;
+};
+
+struct RankDiff {
+  RankDiff() {}
+  constexpr RankDiff(int i) :index{i} {}
+  int index;
+};
+
+struct Direction {
+  Direction() {}
+  constexpr Direction(FileDiff f, RankDiff r): fd{f}, rd{r} {}
+  FileDiff fd;
+  RankDiff rd;
+};
+
+constexpr Color operator~(const Color c) {
+  return static_cast<Color>(static_cast<int>(c)^1);
+}
+
+constexpr File operator+(const File f, const FileDiff fd) {return {f.index + fd.index};}
+constexpr Rank operator+(const Rank r, const RankDiff rd) {return {r.index + rd.index};}
+constexpr Square operator+(const Square& sq, const Direction& d) { return {sq.file + d.fd, sq.rank + d.rd}; }
+
+constexpr bool operator==(const Rank a, const Rank b) {return a.index==b.index;}
+constexpr bool operator==(const File a, const File b) {return a.index==b.index;}
+constexpr bool operator==(const Square& a, const Square& b) { return a.rank==b.rank && a.file==b.file; }
+
+string pieces_to_string(const vector<Piece>& pcs);
+string square_to_alg(const Square& sq);
+Square algebraic_to_square(const string& alg);
+
+constexpr char piece_to_char(const Piece pc) {
+  return " PNBRQK  pnbrqk"[static_cast<int>(pc)];
+}
+
+constexpr Square int_to_square(int i) {
+  return Square(i%8, 7-i/8);
+}
+
+string move_to_string(const Move& mov);
+
+constexpr PieceType type_of(const Piece& pc) {
+  return static_cast<PieceType>(static_cast<int>(pc)&7);
+}
+
+constexpr Color color_of(const Piece& pc) {
+  return static_cast<Color>((static_cast<int>(pc)&8)>>3);
+}
+constexpr Color char_to_color(const char col) {
+  //return col[0]=='w' ? Color::white : Color::black;
+  return static_cast<Color>(static_cast<int>(col=='w'));
+}
+
+constexpr int square_to_int(const Square& sq) {
+  return sq.file.index + (7-sq.rank.index)*8;
+}
+
+constexpr int color_factor(const Color col) {
+  return 1-2*static_cast<int>(col);
+}
+
+constexpr char color_to_char(const Color col) {
+  //return col==Color::white ? 'w' : 'b';
+  return 'w'^(21*static_cast<int>(col));
+}
+
 
 #endif

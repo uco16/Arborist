@@ -4,6 +4,7 @@
 #include "position.h"
 #include "misc.h"
 #include "evaluate.h"
+#include "search.h"
 
 using std::string;
 using std::vector;
@@ -54,7 +55,6 @@ int position(Position& pos, const vector<string>& tokens)
     }
     fen = tokens[1] + ' ' + tokens[2] + ' ' + tokens[3] + ' ' + tokens[4] + ' ' + tokens[5] + ' ' + tokens[6];
   }
-  std::cout << "'" << fen << "'\n";
   pos.set(fen);
   return 0;
 }
@@ -80,18 +80,27 @@ void handle(const string& line, Position& pos)
 //    else if (cmd=="ucinewgame") ucinewgame();
     else if (cmd=="isready") 
       std::cout << "readyok\n";
-    else if (cmd=="position") 
-    {
+    else if (cmd=="position") {
       vector<string> tokens = {inputs.begin()+i+1, inputs.end()};
       position(pos, tokens);
     }
-    else if (cmd=="moves") 
-    {
+    else if (cmd=="fen")
+      std::cout << pos.fen() << "\n";
+    else if (cmd=="moves") {
       vector<string> tokens = {inputs.begin()+i+1, inputs.end()};
       moves(pos, tokens);
     }
     else if (cmd=="evaluate")
       std::cout << evaluate(pos) << "\n";
+    else if (cmd=="go")
+    {
+      if (inputs.size() > i+1 && inputs[i+1]=="infinite")
+	negaMax(6, pos);
+      else if (inputs.size() > i+1 && isdigit(inputs[i+1][0]))
+	negaMax(inputs[i+1][0]-'0', pos);
+      else
+	std::cout << "go: expected depth argument\n";
+    }
     else 
       continue;
     // an if statement matched: main command was found
@@ -112,7 +121,6 @@ void listen()
     std::cout << indicator << ' ';
     std::getline(std::cin, line);
     handle(line, pos);
-    std::cout << "current position: " << pos.fen() << "\n";
   }
 }
 

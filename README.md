@@ -1,2 +1,2 @@
 # Arborist
-A chess engine
+A UCI chess engine
