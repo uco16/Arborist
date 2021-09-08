@@ -3,6 +3,6 @@
 
 #include "position.h"
 
-int negaMax(int depth, const Position& pos, int maxdepth=0);
+int negaMax(int depth, Position pos, bool verbose=false, int maxdepth=0);
 
 #endif

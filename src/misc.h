@@ -8,6 +8,10 @@
 using std::vector;
 using std::string;
 
+#include "bitboard.h"
+
 vector<string> split(const string& s);
+
+std::ostream& display(std::ostream& os, const Bitboard bb);
 
 #endif

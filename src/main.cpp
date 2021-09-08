@@ -5,6 +5,7 @@
 #include "misc.h"
 #include "evaluate.h"
 #include "search.h"
+#include "bitboard.h"
 
 using std::string;
 using std::vector;
@@ -65,7 +66,7 @@ void moves(Position& pos, const vector<string>& tokens)
     pos.move(mv);
 }
 
-void handle(const string& line, Position& pos)
+void handle(const string& line, Position& pos, bool& verbose)
 {
   vector<string> inputs {split(line)};
   bool understood {false};
@@ -86,18 +87,25 @@ void handle(const string& line, Position& pos)
     }
     else if (cmd=="fen")
       std::cout << pos.fen() << "\n";
+    else if (cmd=="bitboards")
+      pos.print_bitboards();
+    else if (cmd=="verbose")
+      verbose = true;
     else if (cmd=="moves") {
       vector<string> tokens = {inputs.begin()+i+1, inputs.end()};
       moves(pos, tokens);
     }
     else if (cmd=="evaluate")
-      std::cout << evaluate(pos) << "\n";
+      std::cout << "evaluation: " << evaluate(pos) << "\n";
     else if (cmd=="go")
     {
       if (inputs.size() > i+1 && inputs[i+1]=="infinite")
-	negaMax(6, pos);
+	negaMax(6, pos, verbose);
       else if (inputs.size() > i+1 && isdigit(inputs[i+1][0]))
-	negaMax(inputs[i+1][0]-'0', pos);
+      {
+	const int depth {inputs[i+1][0]-'0'};
+	negaMax(depth, pos, verbose);
+      }
       else
 	std::cout << "go: expected depth argument\n";
     }
@@ -113,14 +121,17 @@ void handle(const string& line, Position& pos)
 
 void listen()
 {
+  // parameters remembered over multiple commands
+  bool verbose {false};
+  Position pos;
+
   char indicator {'+'};
   string line;
-  Position pos;
   while (line!="quit" && line!="exit")
   {
     std::cout << indicator << ' ';
     std::getline(std::cin, line);
-    handle(line, pos);
+    handle(line, pos, verbose);
   }
 }
 

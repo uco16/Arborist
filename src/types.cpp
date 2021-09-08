@@ -1,10 +1,5 @@
 #include "types.h"
 
-#include <vector>
-#include <string>
-using std::vector;
-using std::string;
-
 string pieces_to_string(const vector<Piece>& pcs)
 {
   string piece_placement;
@@ -41,6 +36,34 @@ string square_to_alg(const Square& sq) {
   return {char('a'+sq.file.index), char('1'+sq.rank.index)};
 }
 
-string move_to_string(const Move& mov) {
-  return square_to_alg(mov.isq) + square_to_alg(mov.fsq);
+// output stream representations
+std::ostream& operator<<(std::ostream& os, const Square& sq) {
+  return os << char('a'+sq.file.index) << char('1'+sq.rank.index);
+}
+std::ostream& operator<<(std::ostream& os, const Move& mov) {
+  return os << mov.isq << mov.fsq;
+}
+std::ostream& operator<<(std::ostream& os, const Color col) {
+  return os << (col==Color::white ? "white" : "black");
+}
+
+Rights string_to_rights(const string& s) {
+  Rights r = {0,0,0,0};
+  for (auto c: s)
+  {
+    if	    (c == 'K') r.K = 1;
+    else if (c == 'Q') r.Q = 1;
+    else if (c == 'k') r.k = 1;
+    else if (c == 'q') r.q = 1;
+  }
+  return r;
+}
+
+string rights_to_string(const Rights& r) {
+  string s {""};
+  if (r.K) s += "K";
+  if (r.Q) s += "Q";
+  if (r.k) s += "k";
+  if (r.q) s += "q";
+  return s;
 }
