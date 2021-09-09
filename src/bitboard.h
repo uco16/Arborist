@@ -225,7 +225,7 @@ constexpr Bitboard shift_left(const Bitboard& bb) {
 
 constexpr Bitboard pawn_attack_bb(const Bitboard& pawns, const Color col) {
   // represents all the squares that the pawns reach via an attack
-  return shift_ranks(shift_left(pawns)&shift_right(pawns), color_factor(col));
+  return shift_ranks(shift_left(pawns)|shift_right(pawns), color_factor(col));
 }
 
 constexpr Bitboard pawn_bb(const Square& sq, const Color col,
