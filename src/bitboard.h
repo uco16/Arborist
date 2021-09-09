@@ -166,36 +166,44 @@ constexpr Bitboard SE_ray(const Square& sq) {
 
 // truncated rays
 constexpr Bitboard S_tray(const Square& sq, const Bitboard& obstructions) {
-  return S_ray(sq)^S_ray(__builtin_clzll(obstructions & S_ray(sq)));
+  return (obstructions & S_ray(sq))==OBB ? S_ray(sq)
+    : S_ray(sq)^S_ray(__builtin_clzll(obstructions & S_ray(sq)));
 }
 constexpr Bitboard E_tray(const Square& sq, const Bitboard& obstructions) {
-  return E_ray(sq)^E_ray(__builtin_clzll(obstructions & E_ray(sq)));
+  return (obstructions & E_ray(sq))==OBB ? E_ray(sq)
+    : E_ray(sq)^E_ray(__builtin_clzll(obstructions & E_ray(sq)));
 }
 constexpr Bitboard SE_tray(const Square& sq, const Bitboard& obstructions) {
-  return SE_ray(sq)^SE_ray(__builtin_clzll(obstructions & SE_ray(sq)));
+  return (obstructions & SE_ray(sq))==OBB ? SE_ray(sq)
+    : SE_ray(sq)^SE_ray(__builtin_clzll(obstructions & SE_ray(sq)));
 }
 constexpr Bitboard SW_tray(const Square& sq, const Bitboard& obstructions) {
-  return SW_ray(sq)^SW_ray(__builtin_clzll(obstructions & SW_ray(sq)));
+  return (obstructions & SW_ray(sq))==OBB ? SW_ray(sq)
+    : SW_ray(sq)^SW_ray(__builtin_clzll(obstructions & SW_ray(sq)));
 }
 constexpr Bitboard N_tray(const Square& sq, const Bitboard& obstructions) {
-  return N_ray(sq)^N_ray(__builtin_ctzll(obstructions & N_ray(sq)));
+  return (obstructions & N_ray(sq))==OBB ? N_ray(sq)
+    : N_ray(sq)^N_ray(63-__builtin_ctzll(obstructions & N_ray(sq)));
 }
 constexpr Bitboard W_tray(const Square& sq, const Bitboard& obstructions) {
-  return W_ray(sq)^W_ray(__builtin_ctzll(obstructions & W_ray(sq)));
+  return (obstructions & W_ray(sq))==OBB ? W_ray(sq)
+    : W_ray(sq)^W_ray(63-__builtin_ctzll(obstructions & W_ray(sq)));
 }
 constexpr Bitboard NE_tray(const Square& sq, const Bitboard& obstructions) {
-  return NE_ray(sq)^NE_ray(__builtin_ctzll(obstructions & NE_ray(sq)));
+  return (obstructions & NE_ray(sq))==OBB ? NE_ray(sq)
+    : NE_ray(sq)^NE_ray(63-__builtin_ctzll(obstructions & NE_ray(sq)));
 }
 constexpr Bitboard NW_tray(const Square& sq, const Bitboard& obstructions) {
-  return NW_ray(sq)^NW_ray(__builtin_ctzll(obstructions & NW_ray(sq)));
+  return (obstructions & NW_ray(sq))==OBB ? NW_ray(sq)
+    : NW_ray(sq)^NW_ray(63-__builtin_ctzll(obstructions & NW_ray(sq)));
 }
 
 // truncated sliding piece patterns
 constexpr Bitboard rook_bb(const Square& sq, const Bitboard& obs) {
-  return S_tray(sq, obs) & E_tray(sq, obs) & N_tray(sq, obs) & W_tray(sq, obs);
+  return S_tray(sq, obs) | E_tray(sq, obs) | N_tray(sq, obs) | W_tray(sq, obs);
 }
 constexpr Bitboard bishop_bb(const Square& sq, const Bitboard& obs) {
-  return NE_tray(sq, obs) & SE_tray(sq, obs) & NW_tray(sq, obs) & SW_tray(sq, obs);
+  return NE_tray(sq, obs) | SE_tray(sq, obs) | NW_tray(sq, obs) | SW_tray(sq, obs);
 }
 constexpr Bitboard queen_bb(const Square& sq, const Bitboard& obs) {
   return rook_bb(sq, obs) | bishop_bb(sq, obs);
@@ -204,7 +212,7 @@ constexpr Bitboard queen_bb(const Square& sq, const Bitboard& obs) {
 // --- pawn patterns ---
 
 constexpr Bitboard shift_ranks(const Bitboard& bb, const int shift_count) {
-  return shift_count >= 0 ? bb << 8*shift_count : bb >> 8*shift_count;
+  return shift_count >= 0 ? bb << 8*shift_count : bb >> -8*shift_count;
 }
 
 // when shifting right and left, we first need to clear the digits that will be shifted off
@@ -223,7 +231,7 @@ constexpr Bitboard pawn_attack_bb(const Bitboard& pawns, const Color col) {
 constexpr Bitboard pawn_bb(const Square& sq, const Color col,
 		       const Bitboard& friends, const Bitboard& foes,
 		       const Bitboard& enpassant_sq_bb=OBB) {
-  const Bitboard occupied {friends&foes};
+  const Bitboard occupied {friends|foes};
   const Bitboard sq_bb {square_to_bb(sq)};
   const Bitboard single_step { shift_ranks(sq_bb, color_factor(col)) & ~occupied};
   const Bitboard double_step { 
@@ -233,7 +241,7 @@ constexpr Bitboard pawn_bb(const Square& sq, const Color col,
 	  , color_factor(col)) & ~occupied  // ...and the square one above is empty
       , color_factor(col)) & ~occupied  // ...and the square two above is empty
   };
-  const Bitboard captures { pawn_attack_bb(sq_bb, col)&(foes|enpassant_sq_bb) };
+  const Bitboard captures { pawn_attack_bb(sq_bb, col) & (foes|enpassant_sq_bb) };
   return single_step | double_step | captures;
 }
 

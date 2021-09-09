@@ -57,7 +57,7 @@ string Position::fen() const
   char color {color_to_char(active_color)};
   string rights {rights_to_string(castling_rights)};
   string enpassant = has_enpassant ? square_to_alg(enpassant_square) : "-";
-  
+
   return piece_placement + " " 
     + color + " " 
     + rights + " " 
@@ -196,15 +196,15 @@ vector<Move> bb_to_moves(const Square& isq, const Bitboard& fsq_bb) {
   return moves;
 }
 vector<Move> rook_moves(const Square& isq, const Bitboard& foes, const Bitboard& friends) {
-  const Bitboard occupancy {foes & friends};
+  const Bitboard occupancy {foes | friends};
   return bb_to_moves(isq, rook_bb(isq, occupancy)&~friends);
 }
 vector<Move> bishop_moves(const Square& isq, const Bitboard& foes, const Bitboard& friends) {
-  const Bitboard occupancy {foes & friends};
+  const Bitboard occupancy {foes | friends};
   return bb_to_moves(isq, bishop_bb(isq, occupancy)&~friends);
 }
 vector<Move> queen_moves(const Square& isq, const Bitboard& foes, const Bitboard& friends) {
-  const Bitboard occupancy {foes & friends};
+  const Bitboard occupancy {foes | friends};
   return bb_to_moves(isq, queen_bb(isq, occupancy)&~friends);
 }
 
@@ -230,8 +230,8 @@ vector<Move> Position::possible_moves(const PieceType& type, const Square& isq) 
     case PieceType::knight: return dir_moves  (isq, knight_directions,	friends);
     case PieceType::king  : return dir_moves  (isq, king_directions,	friends);
     case PieceType::rook  : return rook_moves (isq, foes, friends);
-    case PieceType::bishop: return bishop_moves(isq, foes, friends );
-    case PieceType::queen : return queen_moves(isq, foes, friends );
+    case PieceType::bishop: return bishop_moves(isq, foes, friends);
+    case PieceType::queen : return queen_moves(isq, foes, friends);
   }
   return {};
 }
