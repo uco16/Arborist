@@ -3,10 +3,7 @@
 #include "types.h"
 #include <iostream>
 
-const int INT_MAX = (~0u)>>1;
-const int INT_MIN = ~INT_MAX;
-
-int negaMax(int depth, Position pos, bool verbose, int maxdepth) {
+int negaMax(int depth, Position pos, bool verbose, int maxdepth, int best_at_previous_depth) {
 
   if (depth > maxdepth)
     maxdepth = depth;
@@ -42,11 +39,17 @@ int negaMax(int depth, Position pos, bool verbose, int maxdepth) {
     Square enpassant_sq {pos.enpassant()};
     Piece captured_piece {pos.get(mov.fsq)};
     pos.move(mov);
-    int score = -negaMax(depth-1, pos, verbose, maxdepth);
+    int score = -negaMax(depth-1, pos, verbose, maxdepth, maxi);
     pos.unmove(mov, captured_piece, enpassant_sq);
 
     if (verbose)
       std::cout << tabs << " | NegaMax score: " << score;
+
+    if (best_at_previous_depth > INT_MIN && score >= -1*best_at_previous_depth) {
+      if (verbose)
+	std::cout << ">=" << -1*best_at_previous_depth << ", can prune.\n";
+      return score;
+    }
 
     if (score > maxi) {
       maxi = score;
